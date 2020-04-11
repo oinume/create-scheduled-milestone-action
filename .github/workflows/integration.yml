@@ -9,6 +9,8 @@ jobs:
         id: integration_test
         # Put your action repo here
         uses: oinume/create-milestone-action@milestone
+        with:
+          title: "v{{ github.run_id }}"
       - name: Check outputs
         run: |
           test "${{ steps.integration_test.outputs.number }}" != ""
