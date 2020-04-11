@@ -26,7 +26,7 @@ git-config:
 	git config --global http.https://gopkg.in.followRedirects true
 
 build:
-	CGO_ENABLED=0 GO111MODULE=on go build -ldflags="-w -s" -o bin/$(APP) .
+	CGO_ENABLED=0 GO111MODULE=on go build -ldflags="-w -s" -o $(APP) .
 
 clean:
 	${RM} $(foreach command,$(COMMANDS),bin/$(command))
