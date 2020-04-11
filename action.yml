@@ -6,17 +6,20 @@ branding:
   color: "orange"
 inputs:
   title:
-    description: "The title (version) for the milestone"
+    description: "The title of the milestone."
     required: true
+  state:
+    description: "The state of the milestone. Either open or closed. Default: open"
+    required: false
   description:
-    description: "An optional description for the milestone"
+    description: "A description of the milestone."
     required: false
   due_on:
-    description: "AN optional due date for the milestone"
+    description: "The milestone due date. This is a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ."
     required: false
 outputs:
   number:
-    description: "The number of the newly created milestone"
+    description: "The number of the newly created milestone."
 runs:
   using: "docker"
   image: "Dockerfile"
