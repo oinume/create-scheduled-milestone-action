@@ -1,0 +1,14 @@
+name: integration-test
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Self test
+        id: self-test
+        # Put your action repo here
+        uses: oinume/create-minestone-action@master
+      - name: Check outputs
+        run: |
+          test "${{ steps.selftest.outputs.myOutput }}" == "Hello world"
