@@ -8,7 +8,7 @@ jobs:
       - name: Self test
         id: self-test
         # Put your action repo here
-        uses: oinume/create-minestone-action@master
+        uses: oinume/create-milestone-action@master
       - name: Check outputs
         run: |
           test "${{ steps.selftest.outputs.myOutput }}" == "Hello world"
