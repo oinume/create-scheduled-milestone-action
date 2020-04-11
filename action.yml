@@ -1,14 +1,22 @@
-name: "Go Container Action Template"
-description: "Get started with Go Container actions"
-author: "Jacob Tomlinson"
+name: "Create Scheduled Milestone"
+description: "Create a new milestone with the given title, description and due date"
+author: "Kazuhiro Oinuma"
+branding:
+  icon: "check-circle"
+  color: "orange"
 inputs:
-  myInput:
-    description: "Input to use"
-    default: "world"
+  title:
+    description: "The title (version) for the milestone"
     required: true
+  description:
+    description: "An optional description for the milestone"
+    required: false
+  due_on:
+    description: "AN optional due date for the milestone"
+    required: false
 outputs:
-  myOutput:
-    description: "Output from the action"
+  number:
+    description: "The number of the newly created milestone"
 runs:
   using: "docker"
   image: "Dockerfile"
