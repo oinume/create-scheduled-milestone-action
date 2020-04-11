@@ -35,7 +35,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("::set-output name=myOutput::%d\n", number)
+	fmt.Printf("::set-output name=number::%d\n", number)
 	os.Exit(0)
 }
 
