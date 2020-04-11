@@ -8,7 +8,7 @@ jobs:
       - name: Integration test
         id: integration_test
         # Put your action repo here
-        uses: oinume/create-milestone-action@milestone
+        uses: oinume/create-milestone-action@master
         with:
           title: "v${{ github.run_id }}"
         env:
