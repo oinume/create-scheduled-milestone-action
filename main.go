@@ -66,7 +66,7 @@ func (m *milestone) toGitHub() *github.Milestone {
 func newMilestone(githubRepository, title, description, dueOn string) (*milestone, error) {
 	r := strings.Split(githubRepository, "/")
 	if len(r) != 2 {
-		return nil, errors.New("hoge")
+		return nil, errors.New("invalid repository format")
 	}
 	if title == "" {
 		return nil, errors.New("'title' is required")
