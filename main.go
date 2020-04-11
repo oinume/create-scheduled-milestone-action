@@ -14,13 +14,6 @@ import (
 
 func main() {
 	ctx := context.Background()
-	githubToken := os.Getenv("GITHUB_TOKEN")
-	client := newGitHubClient(ctx, githubToken)
-
-	a := &app{
-		githubClient: client,
-	}
-
 	githubRepository := os.Getenv("GITHUB_REPOSITORY")
 	title := os.Getenv("INPUT_TITLE")
 	state := os.Getenv("INPUT_STATE")
@@ -30,6 +23,12 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
+	}
+
+	githubToken := os.Getenv("GITHUB_TOKEN")
+	client := newGitHubClient(ctx, githubToken)
+	a := &app{
+		githubClient: client,
 	}
 
 	number, err := a.run(ctx, m)
@@ -59,7 +58,6 @@ type milestone struct {
 func (m *milestone) toGitHub() *github.Milestone {
 	ghm := &github.Milestone{
 		Title:       &m.title,
-		Description: &m.description,
 	}
 	if m.state != "" {
 		ghm.State = &m.state
