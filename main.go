@@ -1,9 +1,13 @@
 package main
 
 import (
+	"context"
 	"errors"
+	"golang.org/x/oauth2"
 	"os"
 	"time"
+
+	"github.com/google/go-github/v31/github"
 )
 
 func main() {
@@ -12,9 +16,14 @@ func main() {
 	//output := fmt.Sprintf("Hello %s", myInput)
 	//
 	//fmt.Println(fmt.Sprintf(`::set-output name=myOutput::%s`, output))
+	ctx := context.Background()
+	githubToken := os.Getenv("GITHUB_TOKEN")
+	client := newGitHubClient(ctx, githubToken)
+
 	a := &app{
-		// TODO: github client
+		githubClient: client,
 	}
+
 	title := os.Getenv("INPUT_TITLE")
 	description := os.Getenv("INPUT_DESCRIPTION")
 	dueOn := os.Getenv("INPUT_DUE_ON")
@@ -24,7 +33,18 @@ func main() {
 	os.Exit(0)
 }
 
-type app struct {}
+type app struct {
+	githubClient *github.Client
+	// TODO: outStream, errStream
+}
+
+func newGitHubClient(ctx context.Context, token string) *github.Client {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	return github.NewClient(tc)
+}
 
 func (c *app) run(title, description string, dueOn string) error {
 	if title == "" {
