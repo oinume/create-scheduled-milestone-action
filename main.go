@@ -3,19 +3,16 @@ package main
 import (
 	"context"
 	"errors"
-	"golang.org/x/oauth2"
+	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/google/go-github/v31/github"
+	"golang.org/x/oauth2"
 )
 
 func main() {
-	//myInput := os.Getenv("INPUT_MYINPUT")
-	//
-	//output := fmt.Sprintf("Hello %s", myInput)
-	//
-	//fmt.Println(fmt.Sprintf(`::set-output name=myOutput::%s`, output))
 	ctx := context.Background()
 	githubToken := os.Getenv("GITHUB_TOKEN")
 	client := newGitHubClient(ctx, githubToken)
@@ -24,18 +21,69 @@ func main() {
 		githubClient: client,
 	}
 
+	githubRepository := os.Getenv("GITHUB_REPOSITORY")
 	title := os.Getenv("INPUT_TITLE")
 	description := os.Getenv("INPUT_DESCRIPTION")
 	dueOn := os.Getenv("INPUT_DUE_ON")
-	if err := a.run(title, description, dueOn); err != nil {
+	m, err := newMilestone(githubRepository, title, description, dueOn)
+	if err != nil {
 		os.Exit(1)
 	}
+
+	number, err := a.run(ctx, m)
+	if err != nil {
+		os.Exit(1)
+	}
+
+	fmt.Printf("::set-output name=myOutput::%d\n", number)
 	os.Exit(0)
 }
 
 type app struct {
 	githubClient *github.Client
 	// TODO: outStream, errStream
+}
+
+type milestone struct {
+	owner       string
+	repo        string
+	title       string
+	description string
+	dueOn       time.Time
+}
+
+func (m *milestone) toGitHub() *github.Milestone {
+	ghm := &github.Milestone{
+		Title:       &m.title,
+		Description: &m.description,
+	}
+	if !m.dueOn.IsZero() {
+		ghm.DueOn = &m.dueOn
+	}
+	return ghm
+}
+
+func newMilestone(githubRepository, title, description, dueOn string) (*milestone, error) {
+	r := strings.Split(githubRepository, "/")
+	if len(r) != 2 {
+		return nil, errors.New("hoge")
+	}
+	if title == "" {
+		return nil, errors.New("'title' is required")
+	}
+
+	dueOnTime, err := time.Parse(time.RFC3339, dueOn)
+	if err != nil {
+		return nil, fmt.Errorf("time.Parse failed: %v", err)
+	}
+
+	return &milestone{
+		owner:       r[0],
+		repo:        r[1],
+		title:       title,
+		description: description,
+		dueOn:       dueOnTime,
+	}, nil
 }
 
 func newGitHubClient(ctx context.Context, token string) *github.Client {
@@ -46,19 +94,15 @@ func newGitHubClient(ctx context.Context, token string) *github.Client {
 	return github.NewClient(tc)
 }
 
-func (c *app) run(title, description string, dueOn string) error {
-	if title == "" {
-		return errors.New("'title' is required")
-	}
-
-	_, err := c.validateDueOn(dueOn)
+func (c *app) run(ctx context.Context, m *milestone) (int, error) {
+	milestone, _, err := c.githubClient.Issues.CreateMilestone(
+		ctx,
+		m.owner,
+		m.repo,
+		m.toGitHub(),
+	)
 	if err != nil {
-		return err
+		return 0, err
 	}
-
-	return nil
-}
-
-func (c *app) validateDueOn(dueOn string) (time.Time, error) {
-	return time.Time{}, nil
+	return milestone.GetNumber(), nil
 }
