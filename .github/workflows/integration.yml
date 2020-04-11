@@ -10,7 +10,9 @@ jobs:
         # Put your action repo here
         uses: oinume/create-milestone-action@milestone
         with:
-          title: "v{{ github.run_id }}"
+          title: "v${{ github.run_id }}"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Check outputs
         run: |
           test "${{ steps.integration_test.outputs.number }}" != ""
