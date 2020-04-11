@@ -74,9 +74,15 @@ func newMilestone(githubRepository, title, description, dueOn string) (*mileston
 		return nil, errors.New("'title' is required")
 	}
 
-	dueOnTime, err := time.Parse(time.RFC3339, dueOn)
-	if err != nil {
-		return nil, fmt.Errorf("time.Parse failed: %v", err)
+	var dueOnTime time.Time
+	if dueOn == "" {
+		dueOnTime = time.Time{}
+	} else {
+		t, err := time.Parse(time.RFC3339, dueOn)
+		if err != nil {
+			return nil, fmt.Errorf("time.Parse failed: %v", err)
+		}
+		dueOnTime = t
 	}
 
 	return &milestone{
