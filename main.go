@@ -27,11 +27,13 @@ func main() {
 	dueOn := os.Getenv("INPUT_DUE_ON")
 	m, err := newMilestone(githubRepository, title, description, dueOn)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 
 	number, err := a.run(ctx, m)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 
