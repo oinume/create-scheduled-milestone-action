@@ -8,7 +8,7 @@ jobs:
       - name: Integration test
         id: integration_test
         # Put your action repo here
-        uses: oinume/create-milestone-action@master
+        uses: oinume/create-milestone-action@milestone
       - name: Check outputs
         run: |
           test "${{ steps.integration_test.outputs.number }}" != ""
