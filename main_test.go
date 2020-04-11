@@ -46,6 +46,7 @@ func Test_newMilestone(t *testing.T) {
 	type args struct {
 		githubRepository string
 		title            string
+		state            string
 		description      string
 		dueOn            string
 	}
@@ -59,6 +60,7 @@ func Test_newMilestone(t *testing.T) {
 			args: args{
 				githubRepository: "oinume/create-milestone-action",
 				title:            "v1.0.0",
+				state:            "open",
 				description:      "v1.0.0 release",
 				dueOn:            "2012-10-09T23:39:01Z",
 			},
@@ -66,6 +68,7 @@ func Test_newMilestone(t *testing.T) {
 				owner:       "oinume",
 				repo:        "create-milestone-action",
 				title:       "v1.0.0",
+				state:       "open",
 				description: "v1.0.0 release",
 				dueOn:       time.Date(2012, 10, 9, 23, 39, 1, 0, time.UTC),
 			},
@@ -75,6 +78,7 @@ func Test_newMilestone(t *testing.T) {
 			args: args{
 				githubRepository: "oinume$create-milestone-action",
 				title:            "",
+				state:            "",
 				description:      "",
 				dueOn:            "",
 			},
@@ -86,6 +90,7 @@ func Test_newMilestone(t *testing.T) {
 			args: args{
 				githubRepository: "oinume/create-milestone-action",
 				title:            "",
+				state:            "",
 				description:      "",
 				dueOn:            "",
 			},
@@ -99,7 +104,7 @@ func Test_newMilestone(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := newMilestone(tt.args.githubRepository, tt.args.title, tt.args.description, tt.args.dueOn)
+			got, err := newMilestone(tt.args.githubRepository, tt.args.title, tt.args.state, tt.args.description, tt.args.dueOn)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("newMilestone() error = %v, wantErr %v", err, tt.wantErr)
 			}

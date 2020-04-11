@@ -23,9 +23,10 @@ func main() {
 
 	githubRepository := os.Getenv("GITHUB_REPOSITORY")
 	title := os.Getenv("INPUT_TITLE")
+	state := os.Getenv("INPUT_STATE")
 	description := os.Getenv("INPUT_DESCRIPTION")
 	dueOn := os.Getenv("INPUT_DUE_ON")
-	m, err := newMilestone(githubRepository, title, description, dueOn)
+	m, err := newMilestone(githubRepository, title, state, description, dueOn)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
@@ -50,6 +51,7 @@ type milestone struct {
 	owner       string
 	repo        string
 	title       string
+	state       string
 	description string
 	dueOn       time.Time
 }
@@ -59,13 +61,19 @@ func (m *milestone) toGitHub() *github.Milestone {
 		Title:       &m.title,
 		Description: &m.description,
 	}
+	if m.state != "" {
+		ghm.State = &m.state
+	}
+	if m.description != "" {
+		ghm.Description = &m.description
+	}
 	if !m.dueOn.IsZero() {
 		ghm.DueOn = &m.dueOn
 	}
 	return ghm
 }
 
-func newMilestone(githubRepository, title, description, dueOn string) (*milestone, error) {
+func newMilestone(githubRepository, title, state, description, dueOn string) (*milestone, error) {
 	r := strings.Split(githubRepository, "/")
 	if len(r) != 2 {
 		return nil, errors.New("invalid repository format")
@@ -89,6 +97,7 @@ func newMilestone(githubRepository, title, description, dueOn string) (*mileston
 		owner:       r[0],
 		repo:        r[1],
 		title:       title,
+		state:       state,
 		description: description,
 		dueOn:       dueOnTime,
 	}, nil
