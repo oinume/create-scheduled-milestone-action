@@ -46,8 +46,8 @@ func Test_app_run(t *testing.T) {
 			want: 111,
 			wantErr: false,
 		},
-		// TODO: Add test cases.
 	}
+
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
@@ -61,11 +61,10 @@ func Test_app_run(t *testing.T) {
 
 			got, err := c.run(tt.args.ctx, tt.args.m)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("run() error = %v, wantErr %v", err, tt.wantErr)
-				return
+				t.Fatalf("run() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if got != tt.want {
-				t.Errorf("run() got = %v, want %v", got, tt.want)
+				t.Errorf("run() got = %v, want = %v", got, tt.want)
 			}
 		})
 	}
