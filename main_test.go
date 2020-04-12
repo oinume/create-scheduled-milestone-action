@@ -1,46 +1,74 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/google/go-github/v31/github"
 )
 
-//func Test_app_run(t *testing.T) {
-//	type fields struct {
-//		githubClient *github.Client
-//	}
-//	type args struct {
-//		ctx context.Context
-//		m   *milestone
-//	}
-//
-//	tests := []struct {
-//		name    string
-//		fields  fields
-//		args    args
-//		want    int
-//		wantErr bool
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			c := &app{
-//				githubClient: tt.fields.githubClient,
-//			}
-//			got, err := c.run(tt.args.ctx, tt.args.m)
-//			if (err != nil) != tt.wantErr {
-//				t.Errorf("run() error = %v, wantErr %v", err, tt.wantErr)
-//				return
-//			}
-//			if got != tt.want {
-//				t.Errorf("run() got = %v, want %v", got, tt.want)
-//			}
-//		})
-//	}
-//}
+func Test_app_run(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		m   *milestone
+	}
+
+	tests := map[string]struct {
+		args    args
+		handler http.Handler
+		want    int
+		wantErr bool
+	}{
+		"status created": {
+			args: args{
+				ctx: context.Background(),
+				m: &milestone{
+					owner:       "oinume",
+					repo:        "create-milestone-action",
+					title:       "v1.0.0",
+					state:       "open",
+					description: "v1.0.0 release",
+					dueOn:       time.Date(2012, 10, 9, 23, 39, 1, 0, time.UTC),
+				},
+			},
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				body := `{"number": 111}`
+				_, _ = fmt.Fprintln(w, body)
+			}),
+			want: 111,
+			wantErr: false,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			ts := httptest.NewServer(tt.handler)
+			defer ts.Close()
+			githubClient := newFakeGitHubClient(t, ts.URL + "/")
+			c := &app{
+				githubClient: githubClient,
+			}
+
+			got, err := c.run(tt.args.ctx, tt.args.m)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("run() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if got != tt.want {
+				t.Errorf("run() got = %v, want = %v", got, tt.want)
+			}
+		})
+	}
+}
 
 func Test_newMilestone(t *testing.T) {
 	type args struct {
@@ -113,4 +141,15 @@ func Test_newMilestone(t *testing.T) {
 			}
 		})
 	}
+}
+
+func newFakeGitHubClient(t *testing.T, baseURL string) *github.Client {
+	t.Helper()
+	c := github.NewClient(nil)
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		t.Fatalf("url.Parse failed: %v", err)
+	}
+	c.BaseURL = u
+	return c
 }
