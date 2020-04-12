@@ -109,6 +109,7 @@ func newGitHubClient(ctx context.Context, token string) *github.Client {
 	return github.NewClient(tc)
 }
 
+// run creates a new milestone and return the milestone number
 func (c *app) run(ctx context.Context, m *milestone) (int, error) {
 	milestone, _, err := c.githubClient.Issues.CreateMilestone(
 		ctx,
