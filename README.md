@@ -1,4 +1,4 @@
-# create-minestone-action
+# create-milestone-action
 Create a milestone
 
 ## TODO
