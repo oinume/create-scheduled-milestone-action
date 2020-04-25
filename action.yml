@@ -1,15 +1,15 @@
 name: "Create Scheduled Milestone"
-description: "Create a new milestone with the given title, description and due date"
+description: "Create a new milestone with the given title, state, description and due date"
 author: "Kazuhiro Oinuma"
 branding:
   icon: "check-circle"
   color: "orange"
 inputs:
   title:
-    description: "The title of the milestone."
+    description: "A title of the milestone."
     required: true
   state:
-    description: "The state of the milestone. Either open or closed. Default: open"
+    description: "A state of the milestone. Either open or closed. Default: open"
     required: false
   description:
     description: "A description of the milestone."
@@ -19,7 +19,7 @@ inputs:
     required: false
 outputs:
   number:
-    description: "The number of the newly created milestone."
+    description: "The number of the created milestone."
 runs:
   using: "docker"
   image: "Dockerfile"

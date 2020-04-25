@@ -1,4 +1,4 @@
-# create-milestone-action
+# create-scheduled-milestone-action
 Create a milestone
 
 ## TODO
