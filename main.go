@@ -71,8 +71,8 @@ func (m *milestone) toGitHub() *github.Milestone {
 	return ghm
 }
 
-func newMilestone(githubRepository, title, state, description, dueOn string) (*milestone, error) {
-	r := strings.Split(githubRepository, "/")
+func newMilestone(repository, title, state, description, dueOn string) (*milestone, error) {
+	r := strings.Split(repository, "/")
 	if len(r) != 2 {
 		return nil, errors.New("invalid repository format")
 	}
