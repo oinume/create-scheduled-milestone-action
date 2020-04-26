@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -31,19 +32,16 @@ func main() {
 		githubClient: client,
 	}
 
-	number, err := a.run(ctx, m)
-	if err != nil {
+	if err := a.run(ctx, m); err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
-
-	fmt.Printf("::set-output name=number::%d\n", number)
 	os.Exit(0)
 }
 
 type app struct {
 	githubClient *github.Client
-	// TODO: outStream, errStream
+	outStream, errStream io.Writer
 }
 
 type milestone struct {
@@ -109,8 +107,8 @@ func newGitHubClient(ctx context.Context, token string) *github.Client {
 	return github.NewClient(tc)
 }
 
-// run creates a new milestone and return the milestone number
-func (c *app) run(ctx context.Context, m *milestone) (int, error) {
+// run creates a new milestone
+func (c *app) run(ctx context.Context, m *milestone) error {
 	milestone, _, err := c.githubClient.Issues.CreateMilestone(
 		ctx,
 		m.owner,
@@ -118,7 +116,8 @@ func (c *app) run(ctx context.Context, m *milestone) (int, error) {
 		m.toGitHub(),
 	)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	return milestone.GetNumber(), nil
+	fmt.Fprintf(c.outStream, "::set-output name=number::%d\n", milestone.GetNumber())
+	return nil
 }

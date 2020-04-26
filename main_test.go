@@ -59,6 +59,7 @@ func Test_app_run(t *testing.T) {
 				githubClient: githubClient,
 			}
 
+			// TODO: Use outStream
 			got, err := c.run(tt.args.ctx, tt.args.m)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("run() error = %v, wantErr %v", err, tt.wantErr)
