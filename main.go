@@ -13,6 +13,11 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// a := newApp(ctx)
+// app.run(ctx)
+//   m, err := app.newMilestone()
+//   err := app.createMilestone(ctx, m)
+//   return 0 or 1
 func main() {
 	ctx := context.Background()
 	githubRepository := os.Getenv("GITHUB_REPOSITORY")
