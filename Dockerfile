@@ -9,6 +9,6 @@ RUN make build
 # https://github.com/GoogleContainerTools/distroless
 FROM gcr.io/distroless/static
 
-COPY --from=builder /app/create-milestone /create-milestone
+COPY --from=builder /app/create-scheduled-milestone /create-scheduled-milestone
 
-ENTRYPOINT ["/create-milestone"]
+ENTRYPOINT ["/create-scheduled-milestone"]
