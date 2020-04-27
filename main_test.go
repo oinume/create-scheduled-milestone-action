@@ -14,6 +14,10 @@ import (
 )
 
 func Test_app_run(t *testing.T) {
+	// TODO: add test
+}
+
+func Test_app_createMilestone(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		m   *milestone
@@ -60,12 +64,12 @@ func Test_app_run(t *testing.T) {
 			}
 
 			// TODO: Use outStream
-			got, err := c.run(tt.args.ctx, tt.args.m)
+			got, err := c.createMilestone(tt.args.ctx, tt.args.m)
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("run() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("createMilestone() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if got != tt.want {
-				t.Errorf("run() got = %v, want = %v", got, tt.want)
+				t.Errorf("createMilestone() got = %v, want = %v", got, tt.want)
 			}
 		})
 	}
