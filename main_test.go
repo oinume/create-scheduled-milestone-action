@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -17,10 +16,6 @@ import (
 )
 
 func Test_app_run(t *testing.T) {
-	type fields struct {
-		outStream    io.Writer
-		errStream    io.Writer
-	}
 	type wants struct {
 		status int
 		out string
@@ -30,7 +25,6 @@ func Test_app_run(t *testing.T) {
 	tests := map[string]struct {
 		envs          map[string]string
 		handler       http.Handler
-		fields        fields
 		wants wants
 	}{
 		"ok": {
@@ -47,14 +41,38 @@ func Test_app_run(t *testing.T) {
 				body := `{"number": 111}`
 				_, _ = fmt.Fprintln(w, body)
 			}),
-			fields: fields{
-				outStream: os.Stdout,
-				errStream: os.Stderr,
-			},
 			wants: wants{
 				status: 0,
 				out: "::set-output name=number::111\n",
 				err: "",
+			},
+		},
+		"error_invalid_github_repository": {
+			envs: map[string]string{
+				"GITHUB_REPOSITORY": "invalid",
+				"INPUT_TITLE": "v1.0.0",
+				"INPUT_STATE": "open",
+				"INPUT_DESCRIPTION": "v1.0.0 release",
+				"INPUT_DUE_ON": "2021-05-10T21:43:54+09:00",
+			},
+			wants: wants{
+				status: 1,
+				out: "",
+				err: "invalid repository format\n",
+			},
+		},
+		"error_empty_title": {
+			envs: map[string]string{
+				"GITHUB_REPOSITORY": "oinume/create-scheduled-milestone-action",
+				"INPUT_TITLE": "",
+				"INPUT_STATE": "open",
+				"INPUT_DESCRIPTION": "v1.0.0 release",
+				"INPUT_DUE_ON": "2021-05-10T21:43:54+09:00",
+			},
+			wants: wants{
+				status: 1,
+				out: "",
+				err: "'title' is required\n",
 			},
 		},
 	}
