@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -14,36 +15,26 @@ import (
 
 func main() {
 	ctx := context.Background()
-	githubRepository := os.Getenv("GITHUB_REPOSITORY")
-	title := os.Getenv("INPUT_TITLE")
-	state := os.Getenv("INPUT_STATE")
-	description := os.Getenv("INPUT_DESCRIPTION")
-	dueOn := os.Getenv("INPUT_DUE_ON")
-	m, err := newMilestone(githubRepository, title, state, description, dueOn)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(1)
-	}
-
 	githubToken := os.Getenv("GITHUB_TOKEN")
-	client := newGitHubClient(ctx, githubToken)
-	a := &app{
-		githubClient: client,
-	}
-
-	number, err := a.run(ctx, m)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Printf("::set-output name=number::%d\n", number)
-	os.Exit(0)
+	status := newApp(
+		newGitHubClient(ctx, githubToken),
+		os.Stdout,
+		os.Stderr,
+	).run(ctx)
+	os.Exit(status)
 }
 
 type app struct {
 	githubClient *github.Client
-	// TODO: outStream, errStream
+	outStream, errStream io.Writer
+}
+
+func newApp(githubClient *github.Client, outStream, errStream io.Writer) *app {
+	return &app{
+		githubClient: githubClient,
+		outStream: outStream,
+		errStream: errStream,
+	}
 }
 
 type milestone struct {
@@ -53,22 +44,6 @@ type milestone struct {
 	state       string
 	description string
 	dueOn       time.Time
-}
-
-func (m *milestone) toGitHub() *github.Milestone {
-	ghm := &github.Milestone{
-		Title:       &m.title,
-	}
-	if m.state != "" {
-		ghm.State = &m.state
-	}
-	if m.description != "" {
-		ghm.Description = &m.description
-	}
-	if !m.dueOn.IsZero() {
-		ghm.DueOn = &m.dueOn
-	}
-	return ghm
 }
 
 func newMilestone(repository, title, state, description, dueOn string) (*milestone, error) {
@@ -101,24 +76,62 @@ func newMilestone(repository, title, state, description, dueOn string) (*milesto
 	}, nil
 }
 
-func newGitHubClient(ctx context.Context, token string) *github.Client {
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-	return github.NewClient(tc)
+func (m *milestone) toGitHub() *github.Milestone {
+	ghm := &github.Milestone{
+		Title:       &m.title,
+	}
+	if m.state != "" {
+		ghm.State = &m.state
+	}
+	if m.description != "" {
+		ghm.Description = &m.description
+	}
+	if !m.dueOn.IsZero() {
+		ghm.DueOn = &m.dueOn
+	}
+	return ghm
 }
 
-// run creates a new milestone and return the milestone number
-func (c *app) run(ctx context.Context, m *milestone) (int, error) {
-	milestone, _, err := c.githubClient.Issues.CreateMilestone(
+func (a *app) run(ctx context.Context) int {
+	githubRepository := os.Getenv("GITHUB_REPOSITORY")
+	title := os.Getenv("INPUT_TITLE")
+	state := os.Getenv("INPUT_STATE")
+	description := os.Getenv("INPUT_DESCRIPTION")
+	dueOn := os.Getenv("INPUT_DUE_ON")
+	m, err := newMilestone(githubRepository, title, state, description, dueOn)
+	if err != nil {
+		fmt.Fprintf(a.errStream, "%v\n", err)
+		return 1
+	}
+
+	created, err := a.createMilestone(ctx, m)
+	if err != nil {
+		fmt.Fprintf(a.errStream, "%v\n", err)
+		return 1
+	}
+	fmt.Fprintf(a.outStream, "::set-output name=number::%d\n", created.GetNumber())
+
+	return 0
+}
+
+// createMilestone creates a new milestone
+func (a *app) createMilestone(ctx context.Context, m *milestone) (*github.Milestone, error) {
+	created, _, err := a.githubClient.Issues.CreateMilestone(
 		ctx,
 		m.owner,
 		m.repo,
 		m.toGitHub(),
 	)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return milestone.GetNumber(), nil
+	return created, nil
+}
+
+func newGitHubClient(ctx context.Context, token string) *github.Client {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	return github.NewClient(tc)
 }

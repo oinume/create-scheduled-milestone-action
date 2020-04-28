@@ -1,4 +1,4 @@
-APP = create-milestone
+APP = create-scheduled-milestone
 BASE_DIR = github.com/oinume/amamonitor
 VENDOR_DIR = vendor
 GO_GET ?= go get
