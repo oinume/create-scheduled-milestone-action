@@ -16,18 +16,22 @@ import (
 	"github.com/google/go-github/v31/github"
 )
 
-func Test_app_run_ok(t *testing.T) {
+func Test_app_run(t *testing.T) {
 	type fields struct {
 		outStream    io.Writer
 		errStream    io.Writer
 	}
+	type wants struct {
+		status int
+		out string
+		err string
+	}
+
 	tests := map[string]struct {
 		envs          map[string]string
 		handler       http.Handler
 		fields        fields
-		wantStatus    int
-		wantOutStream string
-		wantErrStream string
+		wants wants
 	}{
 		"ok": {
 			envs: map[string]string{
@@ -47,9 +51,11 @@ func Test_app_run_ok(t *testing.T) {
 				outStream: os.Stdout,
 				errStream: os.Stderr,
 			},
-			wantStatus:    0,
-			wantOutStream: "::set-output name=number::111\n",
-			wantErrStream: "",
+			wants: wants{
+				status: 0,
+				out: "::set-output name=number::111\n",
+				err: "",
+			},
 		},
 	}
 
@@ -65,75 +71,14 @@ func Test_app_run_ok(t *testing.T) {
 			var outStream, errStream bytes.Buffer
 			a := newApp(githubClient, &outStream, &errStream)
 			ctx := context.Background()
-			if got := a.run(ctx); got != tt.wantStatus {
-				t.Fatalf("run() status: got = %v, want = %v", got, tt.wantStatus)
+			if got := a.run(ctx); got != tt.wants.status {
+				t.Fatalf("run() status: got = %v, want = %v", got, tt.wants.status)
 			}
-			if got := outStream.String(); got != tt.wantOutStream {
-				t.Errorf("run() outStream: got = %v, want = %v", got, tt.wantOutStream)
+			if got := outStream.String(); got != tt.wants.out {
+				t.Errorf("run() out: got = %v, want = %v", got, tt.wants.out)
 			}
-			if got := errStream.String(); got != tt.wantErrStream {
-				t.Errorf("run() errStream: got = %v, want = %v", got, tt.wantErrStream)
-			}
-		})
-	}
-}
-
-func Test_app_createMilestone(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		m   *milestone
-	}
-	wantNumber := 111
-
-	tests := map[string]struct {
-		args    args
-		handler http.Handler
-		want    *github.Milestone
-		wantErr bool
-	}{
-		"status created": {
-			args: args{
-				ctx: context.Background(),
-				m: &milestone{
-					owner:       "oinume",
-					repo:        "create-milestone-action",
-					title:       "v1.0.0",
-					state:       "open",
-					description: "v1.0.0 release",
-					dueOn:       time.Date(2012, 10, 9, 23, 39, 1, 0, time.UTC),
-				},
-			},
-			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusCreated)
-				body := `{"number": 111}`
-				_, _ = fmt.Fprintln(w, body)
-			}),
-			want: &github.Milestone{
-				Number: &wantNumber,
-			},
-			wantErr: false,
-		},
-	}
-
-	for name, tt := range tests {
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			ts := httptest.NewServer(tt.handler)
-			defer ts.Close()
-			githubClient := newFakeGitHubClient(t, ts.URL + "/")
-			c := &app{
-				githubClient: githubClient,
-			}
-
-			// TODO: Use outStream
-			got, err := c.createMilestone(tt.args.ctx, tt.args.m)
-			if (err != nil) != tt.wantErr {
-				t.Fatalf("createMilestone(): error = %v, wantErrStream = %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("createMilestone(): got = %v, wantStatus = %v", got, tt.want)
+			if got := errStream.String(); got != tt.wants.err {
+				t.Errorf("run() err: got = %v, want = %v", got, tt.wants.err)
 			}
 		})
 	}
@@ -214,7 +159,7 @@ func Test_newMilestone(t *testing.T) {
 
 func newFakeGitHubClient(t *testing.T, baseURL string) *github.Client {
 	t.Helper()
-	c := github.NewClient(nil)
+	c := newGitHubClient(context.Background(), "")
 	u, err := url.Parse(baseURL)
 	if err != nil {
 		t.Fatalf("url.Parse failed: %v", err)
