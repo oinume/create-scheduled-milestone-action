@@ -67,7 +67,7 @@ jobs:
 
       - name: "Create a new milestone"
         id: create-milestone
-        uses: oinume/create-scheduled-milestone-actions@v1.0.0
+        uses: oinume/create-scheduled-milestone-action@v1.0.0
         with:
           title: "1.0.0"
           state: "open"
