@@ -1,6 +1,6 @@
 # create-scheduled-milestone-action
 
-A GitHub Action which can create a milestone with given title, state, description and due date.
+A GitHub Action which can create a milestone with given title, state, description and due date. This GitHub Action is inspired by [github-action-create-milestone](https://github.com/marketplace/actions/create-milestone). The action doesn't support setting due_on and state so I created another one.
 
 ## Options
 

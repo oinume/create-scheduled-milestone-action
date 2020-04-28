@@ -1,9 +1,6 @@
 name: "Create Scheduled Milestone"
 description: "Create a new milestone with the given title, state, description and due date"
 author: "Kazuhiro Oinuma"
-branding:
-  icon: "check-circle"
-  color: "orange"
 inputs:
   title:
     description: "A title of the milestone."
@@ -23,3 +20,6 @@ outputs:
 runs:
   using: "docker"
   image: "Dockerfile"
+branding:
+  icon: 'calendar'
+  color: 'orange'
