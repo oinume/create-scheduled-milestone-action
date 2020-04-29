@@ -11,6 +11,7 @@ jobs:
         uses: oinume/create-scheduled-milestone-action@master
         with:
           title: "v${{ github.run_id }}"
+          state: "open"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Check outputs

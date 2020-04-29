@@ -54,6 +54,9 @@ func newMilestone(repository, title, state, description, dueOn string) (*milesto
 	if title == "" {
 		return nil, errors.New("'title' is required")
 	}
+	if !(state == "open" || state == "closed") {
+		return nil, errors.New("'state' must be open or closed")
+	}
 
 	var dueOnTime time.Time
 	if dueOn == "" {
