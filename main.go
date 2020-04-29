@@ -25,15 +25,15 @@ func main() {
 }
 
 type app struct {
-	githubClient *github.Client
+	githubClient         *github.Client
 	outStream, errStream io.Writer
 }
 
 func newApp(githubClient *github.Client, outStream, errStream io.Writer) *app {
 	return &app{
 		githubClient: githubClient,
-		outStream: outStream,
-		errStream: errStream,
+		outStream:    outStream,
+		errStream:    errStream,
 	}
 }
 
@@ -81,7 +81,7 @@ func newMilestone(repository, title, state, description, dueOn string) (*milesto
 
 func (m *milestone) toGitHub() *github.Milestone {
 	ghm := &github.Milestone{
-		Title:       &m.title,
+		Title: &m.title,
 	}
 	if m.state != "" {
 		ghm.State = &m.state
@@ -103,16 +103,16 @@ func (a *app) run(ctx context.Context) int {
 	dueOn := os.Getenv("INPUT_DUE_ON")
 	m, err := newMilestone(githubRepository, title, state, description, dueOn)
 	if err != nil {
-		fmt.Fprintf(a.errStream, "%v\n", err)
+		_, _ = fmt.Fprintf(a.errStream, "%v\n", err)
 		return 1
 	}
 
 	created, err := a.createMilestone(ctx, m)
 	if err != nil {
-		fmt.Fprintf(a.errStream, "%v\n", err)
+		_, _ = fmt.Fprintf(a.errStream, "%v\n", err)
 		return 1
 	}
-	fmt.Fprintf(a.outStream, "::set-output name=number::%d\n", created.GetNumber())
+	_, _ = fmt.Fprintf(a.outStream, "::set-output name=number::%d\n", created.GetNumber())
 
 	return 0
 }
