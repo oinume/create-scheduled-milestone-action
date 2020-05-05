@@ -18,22 +18,22 @@ import (
 func Test_app_run(t *testing.T) {
 	type wants struct {
 		status int
-		out string
-		err string
+		out    string
+		err    string
 	}
 
 	tests := map[string]struct {
-		envs          map[string]string
-		handler       http.Handler
-		wants wants
+		envs    map[string]string
+		handler http.Handler
+		wants   wants
 	}{
 		"ok": {
 			envs: map[string]string{
 				"GITHUB_REPOSITORY": "oinume/create-scheduled-milestone-action",
-				"INPUT_TITLE": "v1.0.0",
-				"INPUT_STATE": "open",
+				"INPUT_TITLE":       "v1.0.0",
+				"INPUT_STATE":       "open",
 				"INPUT_DESCRIPTION": "v1.0.0 release",
-				"INPUT_DUE_ON": "2021-05-10T21:43:54+09:00",
+				"INPUT_DUE_ON":      "2021-05-10T21:43:54+09:00",
 			},
 			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
@@ -43,36 +43,36 @@ func Test_app_run(t *testing.T) {
 			}),
 			wants: wants{
 				status: 0,
-				out: "::set-output name=number::111\n",
-				err: "",
+				out:    "::set-output name=number::111\n",
+				err:    "",
 			},
 		},
 		"error_invalid_github_repository": {
 			envs: map[string]string{
 				"GITHUB_REPOSITORY": "invalid",
-				"INPUT_TITLE": "v1.0.0",
-				"INPUT_STATE": "open",
+				"INPUT_TITLE":       "v1.0.0",
+				"INPUT_STATE":       "open",
 				"INPUT_DESCRIPTION": "v1.0.0 release",
-				"INPUT_DUE_ON": "2021-05-10T21:43:54+09:00",
+				"INPUT_DUE_ON":      "2021-05-10T21:43:54+09:00",
 			},
 			wants: wants{
 				status: 1,
-				out: "",
-				err: "invalid repository format\n",
+				out:    "",
+				err:    "invalid repository format\n",
 			},
 		},
 		"error_empty_title": {
 			envs: map[string]string{
 				"GITHUB_REPOSITORY": "oinume/create-scheduled-milestone-action",
-				"INPUT_TITLE": "",
-				"INPUT_STATE": "open",
+				"INPUT_TITLE":       "",
+				"INPUT_STATE":       "open",
 				"INPUT_DESCRIPTION": "v1.0.0 release",
-				"INPUT_DUE_ON": "2021-05-10T21:43:54+09:00",
+				"INPUT_DUE_ON":      "2021-05-10T21:43:54+09:00",
 			},
 			wants: wants{
 				status: 1,
-				out: "",
-				err: "'title' is required\n",
+				out:    "",
+				err:    "'title' is required\n",
 			},
 		},
 	}
@@ -83,7 +83,7 @@ func Test_app_run(t *testing.T) {
 		}
 		ts := httptest.NewServer(tt.handler)
 		defer ts.Close()
-		githubClient := newFakeGitHubClient(t, ts.URL + "/")
+		githubClient := newFakeGitHubClient(t, ts.URL+"/")
 
 		t.Run(name, func(t *testing.T) {
 			var outStream, errStream bytes.Buffer
