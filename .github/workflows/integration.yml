@@ -5,9 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Integration test
-        id: integration_test
-        # Put your action repo here
+      - name: Create milestone
+        id: create_milestone
         uses: oinume/create-scheduled-milestone-action@master
         with:
           title: "v${{ github.run_id }}"
@@ -16,4 +15,4 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Check outputs
         run: |
-          test "${{ steps.integration_test.outputs.number }}" != ""
+          test "${{ steps.create_milestone.outputs.number }}" != ""
