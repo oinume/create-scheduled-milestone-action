@@ -1,7 +1,7 @@
 name: integration-test
 on: [push]
 jobs:
-  build:
+  integration-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
