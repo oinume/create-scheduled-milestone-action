@@ -1,5 +1,5 @@
 APP = create-scheduled-milestone
-BASE_DIR = github.com/oinume/amamonitor
+BASE_DIR = github.com/oinume/create-scheduled-milestone
 VENDOR_DIR = vendor
 GO_GET ?= go get
 GO_TEST ?= go test -v -race
@@ -7,7 +7,6 @@ GO_TEST_PACKAGES = $(shell go list ./... | grep -v vendor)
 GOPATH = $(shell go env GOPATH)
 LINT_PACKAGES = $(shell go list ./...)
 IMAGE_TAG ?= latest
-VERSION_HASH_VALUE = $(shell git rev-parse HEAD | cut -c-7)
 
 
 all: build
@@ -17,7 +16,7 @@ setup: install-linter
 
 .PHONY: install-linter
 install-linter:
-	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(GOPATH)/bin v1.18.0
+	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(GOPATH)/bin v1.31.0
 
 .PHONY: git-config
 git-config:
@@ -47,13 +46,3 @@ lint: install-linter
 .PHONY: docker/build
 docker/build:
 	docker build --pull --no-cache -f Dockerfile .
-
-#.PHONY: gcloud/builds
-#gcloud/builds: $(foreach command,$(COMMANDS),gcloud/builds/$(command))
-#
-#.PHONY: gcloud/builds/%
-#gcloud/builds/%:
-#	gcloud builds submit . \
-#	--project $(GCP_PROJECT_ID) \
-#	--config=gcloud-builds.yml \
-#	--substitutions=_IMAGE_TAG=$(IMAGE_TAG),_COMMAND=$*
