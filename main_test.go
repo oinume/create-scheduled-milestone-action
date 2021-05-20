@@ -81,11 +81,12 @@ func Test_app_run(t *testing.T) {
 		for k, v := range tt.envs {
 			_ = os.Setenv(k, v)
 		}
-		ts := httptest.NewServer(tt.handler)
-		defer ts.Close()
-		githubClient := newFakeGitHubClient(t, ts.URL+"/")
 
 		t.Run(name, func(t *testing.T) {
+			ts := httptest.NewServer(tt.handler)
+			defer ts.Close()
+			githubClient := newFakeGitHubClient(t, ts.URL+"/")
+
 			var outStream, errStream bytes.Buffer
 			a := newApp(githubClient, &outStream, &errStream)
 			ctx := context.Background()
