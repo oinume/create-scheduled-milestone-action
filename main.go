@@ -90,7 +90,7 @@ func (m *milestone) toGitHub() *github.Milestone {
 		ghm.Description = &m.description
 	}
 	if !m.dueOn.IsZero() {
-		ghm.DueOn = &m.dueOn
+		ghm.DueOn = &github.Timestamp{Time: m.dueOn}
 	}
 	return ghm
 }
