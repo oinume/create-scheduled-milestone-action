@@ -67,7 +67,7 @@ jobs:
 
       - name: "Create a new milestone"
         id: create-milestone
-        uses: oinume/create-scheduled-milestone-action@v1.0.0
+        uses: oinume/create-scheduled-milestone-action@v1
         with:
           title: "1.0.0"
           state: "open"
@@ -76,6 +76,6 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: "Output milestone number"
+      - name: "Output created milestone number"
         run: echo ${{ steps.create-milestone.outputs.number }}
 ```
