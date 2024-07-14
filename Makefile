@@ -11,13 +11,6 @@ IMAGE_TAG ?= latest
 
 all: build
 
-.PHONY: setup
-setup: install-linter
-
-.PHONY: install-linter
-install-linter:
-	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(GOPATH)/bin v1.31.0
-
 .PHONY: git-config
 git-config:
 	echo "" > ~/.gitconfig
@@ -34,13 +27,13 @@ clean:
 test:
 	$(GO_TEST) $(GO_TEST_PACKAGES)
 
-.PHONY: goimports
-goimports:
-	goimports -w .
-
+lint: ## Run golangci-lint
+	docker run --rm -v ${GOPATH}/pkg/mod:/go/pkg/mod -v $(shell pwd):/app -v $(shell go env GOCACHE):/cache/go -e GOCACHE=/cache/go -e GOLANGCI_LINT_CACHE=/cache/go -w /app golangci/golangci-lint:v1.59.1 golangci-lint run --modules-download-mode=readonly /app/...
 .PHONY: lint
-lint: install-linter
-	golangci-lint run
+
+lint/fix: ## Run golangci-lint with --fix
+	docker run --rm -v ${GOPATH}/pkg/mod:/go/pkg/mod -v $(shell pwd):/app -v $(shell go env GOCACHE):/cache/go -e GOCACHE=/cache/go -e GOLANGCI_LINT_CACHE=/cache/go -w /app golangci/golangci-lint:v1.59.1 golangci-lint run --fix --modules-download-mode=readonly /app/...
+.PHONY: lint/fix
 
 # TODO: tag
 .PHONY: docker/build
