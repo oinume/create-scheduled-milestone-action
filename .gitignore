@@ -15,3 +15,7 @@
 vendor/
 
 /create-scheduled-milestone
+
+# JetBrains
+.idea
+*.iml
