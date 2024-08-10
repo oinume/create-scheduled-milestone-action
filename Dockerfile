@@ -10,7 +10,9 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     CGO_ENABLED=0 go build -v -o /bin/app
 
 FROM debian:bookworm-slim AS final
-RUN apt-get install -y ca-certificates openssl
+RUN set -eux \
+  apt-get install -qyy --no-install-recommends --no-install-suggests \
+  ca-certificates openssl
 ARG UID=10001
 RUN adduser \
     --disabled-password \
