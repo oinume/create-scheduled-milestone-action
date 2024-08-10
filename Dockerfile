@@ -2,6 +2,9 @@
 
 FROM golang:1.22 AS build
 WORKDIR /src
+RUN set -eux \
+  apt-get install -qyy --no-install-recommends --no-install-suggests \
+  ca-certificates openssl
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,source=go.mod,target=go.mod \
     go mod download -x
