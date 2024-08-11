@@ -57,13 +57,13 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: develop
 
       - name: "Set due_on"
         id: set-due-on
-        run: echo "::set-output name=due_on::$(date --iso-8601=seconds -d '13 days')"
+        run: echo "due_on=$(date --iso-8601=seconds -d '13 days')" >> $GITHUB_ENV
 
       - name: "Create a new milestone"
         id: create-milestone
