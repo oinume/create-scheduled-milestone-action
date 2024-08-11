@@ -72,7 +72,7 @@ jobs:
           title: "1.0.0"
           state: "open"
           description: "v1.0.0"
-          due_on: "${{ env.due_on }}"
+          due_on: "${{ env.DUE_ON }}"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
