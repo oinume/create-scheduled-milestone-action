@@ -7,14 +7,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: "Set due_on"
         id: set-due-on
-        run: echo "due_on=$(date --iso-8601=seconds -d '13 days')" >> $GITHUB_ENV
+        run: echo "DUE_ON=$(date --iso-8601=seconds -d '13 days')" >> $GITHUB_ENV
       - name: "Create milestone"
         id: create_milestone
         uses: oinume/create-scheduled-milestone-action@main
         with:
           title: "v${{ github.run_id }}"
           state: "open"
-          due_on: "${{ steps.set-due-on.outputs.due_on }}"
+          due_on: "${{ env.DUE_ON }}"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Check outputs

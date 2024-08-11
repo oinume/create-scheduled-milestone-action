@@ -63,7 +63,7 @@ jobs:
 
       - name: "Set due_on"
         id: set-due-on
-        run: echo "due_on=$(date --iso-8601=seconds -d '13 days')" >> $GITHUB_ENV
+        run: echo "DUE_ON=$(date --iso-8601=seconds -d '13 days')" >> $GITHUB_ENV
 
       - name: "Create a new milestone"
         id: create-milestone
@@ -72,7 +72,7 @@ jobs:
           title: "1.0.0"
           state: "open"
           description: "v1.0.0"
-          due_on: "${{ steps.set-due-on.outputs.due_on }}"
+          due_on: "${{ env.due_on }}"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
