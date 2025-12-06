@@ -1,0 +1,43 @@
+{
+    dependencyDashboard: true,
+    extends: [
+        ':separateMajorReleases',
+        ':ignoreUnstable',
+        ':prNotPending',
+        ':updateNotScheduled',
+        ':prHourlyLimitNone',
+        ':prConcurrentLimitNone',
+        ':automergeLinters',
+        ':automergeTesters',
+        ':automergeTypes',
+        ':automergePatch',
+        ':automergePr',
+        'group:monorepos',
+        'group:recommended',
+        'schedule:weekends',
+    ],
+    ignoreDeps: [
+        'node',
+        'npm',
+    ],
+    prConcurrentLimit: 2,
+    packageRules: [
+        {
+            prPriority: 20,
+            matchPackageNames: [
+                'github.com/google/go-github',
+                'golang.org/x/oauth2',
+            ],
+            extends: [
+                ':automergeMinor',
+                ':automergePatch',
+                ':automergeDigest',
+            ],
+        },
+    ],
+    prNotPendingHours: 1,
+    postUpdateOptions: [
+        'gomodTidy',
+    ],
+    timezone: 'Asia/Tokyo',
+}
