@@ -4,7 +4,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: "Set due_on"
         id: set-due-on
         run: echo "DUE_ON=$(date --iso-8601=seconds -d '13 days')" >> $GITHUB_ENV
