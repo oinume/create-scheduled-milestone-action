@@ -27,6 +27,7 @@ clean:
 test:
 	$(GO_TEST) $(GO_TEST_PACKAGES)
 
+## TODO: Use go tool
 lint: ## Run golangci-lint
 	docker run --rm -v ${GOPATH}/pkg/mod:/go/pkg/mod -v $(shell pwd):/app -v $(shell go env GOCACHE):/cache/go -e GOCACHE=/cache/go -e GOLANGCI_LINT_CACHE=/cache/go -w /app golangci/golangci-lint:v1.59.1 golangci-lint run --modules-download-mode=readonly /app/...
 .PHONY: lint
