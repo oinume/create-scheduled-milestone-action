@@ -1,8 +1,6 @@
 module github.com/oinume/create-minestone-action
 
-go 1.24.0
-
-toolchain go1.24.10
+go 1.24.10
 
 require (
 	github.com/google/go-github/v63 v63.0.0
