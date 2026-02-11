@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-github/v63/github"
+	"github.com/google/go-github/v80/github"
 )
 
 func Test_app_run(t *testing.T) {
